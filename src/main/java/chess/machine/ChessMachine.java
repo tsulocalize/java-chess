@@ -48,13 +48,11 @@ public class ChessMachine {
             ChessBoard chessBoard = chessBoardService.findChessBoard();
             outputView.printMessage("저장된 데이터로 게임을 시작합니다");
             return new ChessGame(chessBoard);
-        } catch (IllegalArgumentException | IllegalStateException e) {
-            outputView.printMessage("오류: " + e.getMessage());
-            outputView.printMessage("데이터가 없어 새로 게임을 시작합니다");
+        } catch (IllegalArgumentException e) {
+            ChessBoard chessBoard = chessBoardService.createChessBoard();
+            outputView.printMessage(e.getMessage());
+            return new ChessGame(chessBoard);
         }
-
-        ChessBoard chessBoard = ChessBoard.create(new ChessSpaceGenerator());
-        return new ChessGame(chessBoard);
     }
 
     private void playChess(ChessGame chessGame) {

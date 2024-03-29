@@ -1,10 +1,13 @@
 package chess.repository;
 
 import chess.domain.chessGame.ChessBoard;
+import java.util.Optional;
 
 public interface ChessBoardRepository {
 
-    ChessBoard findChessBoard();
+    ChessBoard createChessBoard(ChessBoard chessBoard);
+
+    Optional<ChessBoard> findChessBoard();
 
     ChessBoard saveChessBoard(ChessBoard chessBoard);
 

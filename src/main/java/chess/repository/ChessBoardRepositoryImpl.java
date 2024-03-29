@@ -11,6 +11,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Optional;
 
 public class ChessBoardRepositoryImpl implements ChessBoardRepository {
 
@@ -35,11 +36,26 @@ public class ChessBoardRepositoryImpl implements ChessBoardRepository {
     }
 
     @Override
-    public ChessBoard findChessBoard() {
-        StringSpaceGenerator stringSpaceGenerator = stringSpaceGeneratorConverter.convertToObject(findInBoard("board_state"));
-        Turn turn = turnConverter.convertToObject(findInBoard(TURN_COLUMN));
+    public ChessBoard createChessBoard(ChessBoard chessBoard) {
+        StringSpaceGenerator spaceGenerator = chessBoardSpliter.splitFirst(chessBoard);
+        Turn turn = chessBoardSpliter.splitSecond(chessBoard);
 
-        return chessBoardSpliter.combine(stringSpaceGenerator, turn);
+        createInBoard(
+                stringSpaceGeneratorConverter.convertToData(spaceGenerator),
+                turnConverter.convertToData(turn));
+        return chessBoard;
+    }
+
+    @Override
+    public Optional<ChessBoard> findChessBoard() {
+        try {
+            StringSpaceGenerator stringSpaceGenerator = stringSpaceGeneratorConverter.convertToObject(findInBoard("board_state"));
+            Turn turn = turnConverter.convertToObject(findInBoard(TURN_COLUMN));
+
+            return Optional.of(chessBoardSpliter.combine(stringSpaceGenerator, turn));
+        } catch (IllegalArgumentException | IllegalStateException e) {
+            return Optional.empty();
+        }
     }
 
     @Override
@@ -49,11 +65,8 @@ public class ChessBoardRepositoryImpl implements ChessBoardRepository {
 
         boolean updated = updateIfExist(spaceGenerator, turn);
         if (!updated) {
-            createInBoard(
-                    stringSpaceGeneratorConverter.convertToData(spaceGenerator),
-                    turnConverter.convertToData(turn));
+            createChessBoard(chessBoard);
         }
-
         return chessBoard;
     }
 
@@ -80,8 +93,10 @@ public class ChessBoardRepositoryImpl implements ChessBoardRepository {
 
     @Override
     public void deleteChessBoard() {
-        saveInBoard(BOARD_COLUMN, "");
-        saveInBoard(TURN_COLUMN, "");
+        if (saveDateExist()) {
+            saveInBoard(BOARD_COLUMN, "");
+            saveInBoard(TURN_COLUMN, "");
+        }
     }
 
     public String findInBoard(String columnLabel) {
