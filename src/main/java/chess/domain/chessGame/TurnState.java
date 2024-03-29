@@ -23,21 +23,24 @@ public enum TurnState {
         return Arrays.stream(values())
                 .filter(value -> !value.isActive && value.color == turnState.color)
                 .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("잘못된 상태 설정입니다"));
+                .orElseThrow(() -> new IllegalArgumentException(
+                        String.format("해당 상태를 비활성화 할 수 없습니다: %s", turnState)));
     }
 
     public static TurnState activate(TurnState turnState) {
         return Arrays.stream(values())
                 .filter(value -> value.isActive && value.color == turnState.color)
                 .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("잘못된 상태 설정입니다"));
+                .orElseThrow(() -> new IllegalArgumentException(
+                        String.format("해당 상태를 활성화 할 수 없습니다: %s", turnState)));
     }
 
     public static TurnState of(String stateName) {
         return Arrays.stream(values())
                 .filter(value -> value.name().equals(stateName))
                 .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("잘못된 상태입니다"));
+                .orElseThrow(() -> new IllegalArgumentException(
+                        String.format("입력된 상태를 찾을 수 없습니다: %s", stateName)));
     }
 
     public boolean isActive() {
