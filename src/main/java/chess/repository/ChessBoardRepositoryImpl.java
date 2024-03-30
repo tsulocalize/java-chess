@@ -7,33 +7,21 @@ import chess.repository.exchanger.StringSpaceGenerator;
 import chess.repository.exchanger.StringSpaceGeneratorConverter;
 import chess.repository.exchanger.TurnConverter;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Optional;
 
+import static chess.repository.DbConnector.getConnection;
+
 public class ChessBoardRepositoryImpl implements ChessBoardRepository {
 
-    private static final String SERVER = "localhost:13306";
-    private static final String DATABASE = "chess";
-    private static final String OPTION = "?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC";
-    private static final String USERNAME = "root";
-    private static final String PASSWORD = "root";
     private static final String BOARD_COLUMN = "board_state";
     private static final String TURN_COLUMN = "turn";
 
     private final ChessBoardSpliter chessBoardSpliter = new ChessBoardSpliter();
     private final StringSpaceGeneratorConverter stringSpaceGeneratorConverter = new StringSpaceGeneratorConverter();
     private final TurnConverter turnConverter = new TurnConverter();
-
-    public Connection getConnection() {
-        try {
-            return DriverManager.getConnection("jdbc:mysql://" + SERVER + "/" + DATABASE + OPTION, USERNAME, PASSWORD);
-        } catch (final SQLException e) {
-            throw new IllegalStateException("DB 연결 오류:" + e.getMessage());
-        }
-    }
 
     @Override
     public ChessBoard createChessBoard(ChessBoard chessBoard) {
